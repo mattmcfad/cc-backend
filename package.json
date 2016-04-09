@@ -1,0 +1,18 @@
+{
+  "name": "cash-counter",
+  "version": "0.0.1",
+  "description": "Cash Counter",
+  "main": "app/app.js",
+  "engines": {
+    "node": "5.10.1"
+  },
+  "dependencies": {
+    "express": "^4.13.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
