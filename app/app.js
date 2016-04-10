@@ -20,15 +20,29 @@ routes(app);
 
 const server = http.createServer(app);
 
-databaseAPI.createConnection((err) => {
-  if (err) {
-    global.WINSTON.error(err);
-    process.exit(1);
-  } else {
-    server.listen(app.get('port'), () =>
-      global.WINSTON.info(
-        `Server started at ${new Date().toISOString()} on port ${app.get('port')}`
-      )
-    );
-  }
-});
+function startup() {
+  databaseAPI.createConnection((err) => {
+    if (err) {
+      global.WINSTON.error(err);
+      process.exit(1);
+    } else {
+      server.listen(app.get('port'), () =>
+        global.WINSTON.info(
+          `Server started at ${new Date().toISOString()} on port ${app.get('port')}`
+        )
+      );
+    }
+  });
+}
+
+function shutdown() {
+  global.WINSTON.info('Received kill signal, shutdown server...');
+  server.close();
+  databaseAPI.closeConnection();
+  global.WINSTON.info('Server has been successfully shutdown');
+}
+
+process.on ('SIGTERM', shutdown);
+process.on ('SIGINT', shutdown);
+
+startup();
