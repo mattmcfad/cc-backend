@@ -1,20 +1,15 @@
 'use strict';
 
-const CommonProvider = require('./common-provider');
-const models = require('../models');
+const commonProvider = require('./common-provider');
+const model = require('../models').User;
 
-class UserProvider extends CommonProvider {
-
-  constructor(models) {
-    super(models);
-  }
-
-  getModelName() {
-    return this._models.User.modelName;
-  }
-
+function insert(object) {
+  return commonProvider.insert(model, object);
 }
 
-const userProvider = new UserProvider(models);
+function getById(object) {
+  return commonProvider.getById(model, object);
+}
 
-module.exports = userProvider;
+exports.insert = insert;
+exports.getById = getById;

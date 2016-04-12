@@ -1,54 +1,66 @@
 'use strict';
 
-const UnimplementedException = require('../exceptions/unimplemented-exception');
 const mongoose = require('mongoose');
+const Rx = require('rxjs');
 
-class CommonProvider {
-
-  constructor(models) {
-    this._models = models;
-  }
-
-  getModelName() {
-    throw new UnimplementedException('Not implemented');
-  }
-
-  insert(object, callback) {
-    const entity = new this._models[this.getModelName()](object);
-
+/**
+ * Creates a new record. All validations and restrictions at database
+ * level are declared inside the corresponding model class, along with
+ * its schema.
+ * @param Model mongoose model
+ * @param object
+ * @returns Observable
+ */
+function insert(Model, object) {
+  return Rx.Observable.create(observer => {
+    const entity = new Model(object);
     entity.save((err, result) => {
       if (err) {
-        callback(err);
+        observer.error(err);
       } else {
-        callback(result);
+        observer.next(result);
       }
+      observer.complete();
     });
-  }
+  });
+}
 
-  isIdValid(id) {
-    return mongoose.Types.ObjectId.isValid(id);
-  }
+/**
+ * This checks the record id is a valid mongo ObjectId.
+ * @param id to be validated
+ * @returns {boolean} true if is valid
+ */
+function isIdValid(id) {
+  return mongoose.Types.ObjectId.isValid(id);
+}
 
-  getById(id, callback) {
-    if (this.isIdValid(id)) {
+/**
+ * Gets the record by id.
+ * @param model mongoose model
+ * @param id that must be a valid ObjectId
+ * @returns {*} null if id does not exist
+ */
+function getById(model, id) {
+  return Rx.Observable.create(observer => {
+    if (isIdValid(id)) {
       const filter = {
         '_id': id
       };
-      this._models[this.getModelName()].findOne(filter, (err, results) => {
+      model.findOne(filter, (err, results) => {
         if (err) {
-          const errMsg = global.TRANSLATION.create(
-            'COMMON_PROVIDER.GENERAL_ERROR',
-            JSON.stringify(err)
-          );
-          callback(errMsg);
+          observer.error(err);
+        } else {
+          observer.next(results);
         }
-        callback(results);
+        observer.complete();
       });
     } else {
-      callback(null);
+      observer.next(null);
+      observer.complete();
     }
-  }
-
+  });
 }
 
-module.exports = CommonProvider;
+exports.insert = insert;
+exports.getById = getById;
+exports.isIdValid = isIdValid;

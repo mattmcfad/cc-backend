@@ -1,32 +1,28 @@
 'use strict';
 
-const config = require('../configs/' + (process.env.ENV || 'dev'));
-
 /**
  * Manages access to configs.json file located under configs folder.
  * This class always loads the configuration based on `process.env.ENV`
  */
-class ConfigResource {
+const config = require('../configs/' + (process.env.ENV || 'dev'));
 
-  /**
-   * Reads and builds database connection URI.
-   * @returns string representing the db connection URI
-   */
-  getDBConnectionURI() {
-    return config.MONGO_URI + config.MONGO_DB;
-  }
 
-  /**
-   * Gets a configuration value by id
-   * @param key used to get the value from config map
-   * @returns configuration value
-   */
-  get(key) {
-    return config[key];
-  }
-
+/**
+ * Reads and builds database connection URI.
+ * @returns string representing the db connection URI
+ */
+function getDBConnectionURI() {
+  return config.MONGO_URI + config.MONGO_DB;
 }
 
-const configResource = new ConfigResource();
+/**
+ * Gets a configuration value by id
+ * @param key used to get the value from config map
+ * @returns configuration value
+ */
+function get(key) {
+  return config[key];
+}
 
-module.exports = configResource;
+exports.getDBConnectionURI = getDBConnectionURI;
+exports.get = get;

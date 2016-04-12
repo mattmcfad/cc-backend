@@ -2,5 +2,6 @@
   "MONGO_URI" : "mongodb://localhost:27017/",
   "MONGO_DB" : "cashcounter",
   "MONGO_TEST_URI" : "mongodb://localhost:27017/",
-  "MONGO_TEST_DB" : "cashcounter-test"
+  "MONGO_TEST_DB" : "cashcounter-test",
+  "NODE_TEST_PORT": 3011
 }
