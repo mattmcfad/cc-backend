@@ -39,15 +39,15 @@ gulp.task('ut-tests', () =>
         }))
 ));
 
-gulp.task('api-tests', () =>
+gulp.task('api-tests', (cb) => {
   gulp.src(['app/**/*.js'])
     .pipe(istanbul({includeUntested: true}))
     .pipe(istanbul.hookRequire())
     .on('finish', () =>
       gulp.src([
-        'test/src/api/**/*-spec.js',
-        'test/src/api/global.js'
-      ])
+          'test/src/api/**/*-spec.js',
+          'test/src/api/global.js'
+        ])
         .pipe(gulpMocha({reporter: 'spec'}))
         .pipe(istanbul.writeReports({
           dir: 'test/coverage/api-coverage/reports',
@@ -58,7 +58,9 @@ gulp.task('api-tests', () =>
           ],
           reportOpts: {dir: 'test/coverage/api-coverage/reports'}
         }))
-));
+        .on('end', () => cb())
+    );
+});
 
 gulp.task('merge-coverage', () =>
   istanbulCombine.sync({

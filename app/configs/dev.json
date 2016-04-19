@@ -3,5 +3,14 @@
   "MONGO_DB" : "cashcounter",
   "MONGO_TEST_URI" : "mongodb://localhost:27017/",
   "MONGO_TEST_DB" : "cashcounter-test",
-  "NODE_TEST_PORT": 3011
+  "NODE_TEST_PORT": 3011,
+  "APP_SESSION_NAME": "CashCounter",
+  "APP_SESSION_SECRET": "thereisnodeath",
+  "SERVER_URL": "http://localhost:3010",
+  "GOOGLE_CLIENT_ID": "558974727815-61jq51p1pp7v40lacsf7l54idvhop450.apps.googleusercontent.com",
+  "GOOGLE_CLIENT_SECRET": "jN7lnCPAz4H8l3RiUrh1NmFk",
+  "FACEBOOK_CLIENT_ID": "1679462882305886",
+  "FACEBOOK_CLIENT_SECRET": "e43a307f0cfa92857ddc6b9aeb18b5d5",
+  "GIT_HUB_CLIENT_ID": "e6d65ae2fea1a53424a1",
+  "GIT_HUB_CLIENT_SECRET": "a6a59912b5cb4d404769b6a881ca32ec499f01cf"
 }

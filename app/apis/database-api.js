@@ -1,34 +1,30 @@
 'use strict';
 
+const configResource = require('../services/config-service');
+const BluePromise = require('bluebird');
 const mongoose = require('mongoose');
-const configResource = require('../resources/config-resource');
-const Rx = require('rxjs');
 
-function createConnection() {
-  return Rx.Observable.create(observer => {
+function connect() {
+  return new BluePromise((resolve, reject) => {
     mongoose.connect(configResource.getDBConnectionURI());
     const db = mongoose.connection;
-    db.on('error', (err) => {
-      if (err) {
-        global.WINSTON.error(
-          `Could not connected to database server on 
-        '${configResource.getDBConnectionURI()}' due to error: + ${err}`
-        );
-        observer.error(err);
-        observer.complete();
-      }
+    db.on('error', err => {
+      global.WINSTON.error(
+        `Could not connected to database server on 
+      '${configResource.getDBConnectionURI()}' due to error: + ${err}`
+      );
+      reject(err);
     });
     db.once('open', () => {
       global.WINSTON.info(
         `Connected to database server on '${configResource.getDBConnectionURI()}'`
       );
-      observer.next();
-      observer.complete();
+      resolve();
     });
   });
 }
 
-function closeConnection() {
+function close() {
   mongoose.connection.close();
 }
 
@@ -36,6 +32,6 @@ function dropDatabase() {
   mongoose.connection.db.dropDatabase();
 }
 
-exports.createConnection = createConnection;
-exports.closeConnection = closeConnection;
+exports.connect = connect;
+exports.close = close;
 exports.dropDatabase = dropDatabase;

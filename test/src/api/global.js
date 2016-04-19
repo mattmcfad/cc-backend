@@ -5,7 +5,7 @@ global.WINSTON = require('winston');
 const app = require('../../../app/app');
 const databaseUtil = require('../../../app/apis/database-api');
 const sinon = require('sinon');
-const configResource = require('../../../app/resources/config-resource');
+const configResource = require('../../../app/services/config-resource');
 
 /**
  * Mock config resource so we can run against test database instead of
@@ -20,7 +20,7 @@ sinon.stub(configResource, 'getDBConnectionURI', () =>
  * Start up the server, clean up the database before running tests.
  */
 before(function(done) {
-  this.timeout(5000);
+  this.timeout(1000);
   const port = configResource.get('NODE_TEST_PORT');
   const source = app.startup({
     port: port,

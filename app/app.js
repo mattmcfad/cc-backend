@@ -6,15 +6,36 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const databaseAPI = require('./apis/database-api');
 const routes = require('./routes');
-const Rx = require('rxjs');
+const BluePromise = require('bluebird');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const flash = require('connect-flash');
+const passport = require('passport');
+const lamb = require('lamb');
 const app = express();
 
+
 function setup(config) {
+  const configResource = require('./services/config-service');
   app.set('port', config.port);
   if (config.disableCache) {
     app.disable('etag');
   }
   app.use(bodyParser.json());
+  app.use(cookieParser());
+  app.use(session({
+    name : configResource.getAppSessionName(),
+    secret : configResource.getAppSessionSecret(),
+    rolling : true,
+    resave : false,
+    saveUninitialized : false,
+    cookie: {
+      maxAge: 1800000
+    }
+  }));
+  app.use(flash());
+  app.use(passport.initialize());
+  app.use(passport.session());
   app.use(morgan('dev'));
   routes(app);
 }
@@ -23,21 +44,17 @@ const server = http.createServer(app);
 
 function startup(config) {
   setup(config);
-  return Rx.Observable.create(observer => {
-    databaseAPI.createConnection().subscribe(() => {
-      server.listen(app.get('port'), () => {
-        observer.next(app);
-        observer.complete();
-      });
-    }, (err) => {
-      observer.error(err);
-    });
-  });
+  return databaseAPI.connect().then(() =>
+    BluePromise.promisify(server.listen, {context: server})(app.get('port'))
+      .then(() => app)
+  );
 }
 
 function shutdown() {
-  server.close();
-  databaseAPI.closeConnection();
+  if (!lamb.isNil(server)) {
+    server.close();
+    databaseAPI.close();
+  }
 }
 
 exports.startup = startup;
