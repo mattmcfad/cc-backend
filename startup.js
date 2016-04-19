@@ -4,22 +4,21 @@ global.WINSTON = require('winston');
 
 const app = require('./app/app');
 
+
 function startup() {
   const port = process.env.PORT || 3010;
-  const source = app.startup({
+  const startupPromise = app.startup({
     port: port,
     disableCache: true
   });
-  source.subscribe(
-    app =>
-      global.WINSTON.info(
-        `Server started at ${new Date().toISOString()} on port ${app.get('port')}`
-      ),
-    err => {
-      global.WINSTON.error(err);
-      process.exit(1);
-    }
-  );
+  startupPromise.then(app =>
+    global.WINSTON.info(
+      `Server started at ${new Date().toISOString()} on port ${app.get('port')}`
+    )
+  ).catch(err => {
+    global.WINSTON.error(err);
+    process.exit(1);
+  });
 }
 
 
