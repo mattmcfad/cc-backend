@@ -32,6 +32,8 @@ function dropDatabase() {
   mongoose.connection.db.dropDatabase();
 }
 
-exports.connect = connect;
-exports.close = close;
-exports.dropDatabase = dropDatabase;
+module.exports = {
+  connect,
+  close,
+  dropDatabase
+};

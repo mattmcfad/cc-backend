@@ -12,5 +12,7 @@ function compare(value, hash) {
   return BluePromise.promisify(bcrypt.compare, {context: bcrypt})(value, hash);
 }
 
-exports.encrypt = encrypt;
-exports.compare = compare;
+module.exports = {
+  encrypt,
+  compare
+};

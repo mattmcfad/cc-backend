@@ -47,14 +47,16 @@ function getByKey(key) {
   return config[key];
 }
 
-exports.getDBConnectionURI = getDBConnectionURI;
-exports.getServerUrl = getServerUrl;
-exports.getAppSessionName = getAppSessionName;
-exports.getAppSessionSecret = getAppSessionSecret;
-exports.getGoogleClientId = getGoogleClientId;
-exports.getGoogleClientSecret = getGoogleClientSecret;
-exports.getFacebookClientId = getFacebookClientId;
-exports.getFacebookClientSecrect = getFacebookClientSecrect;
-exports.getGitHubClientId = getGitHubClientId;
-exports.getGitHubClientSecrect = getGitHubClientSecrect;
-exports.get = getByKey;
+module.exports = {
+  getDBConnectionURI,
+  getServerUrl,
+  getAppSessionName,
+  getAppSessionSecret,
+  getGoogleClientId,
+  getGoogleClientSecret,
+  getFacebookClientId,
+  getFacebookClientSecrect,
+  getGitHubClientId,
+  getGitHubClientSecrect,
+  getByKey
+};

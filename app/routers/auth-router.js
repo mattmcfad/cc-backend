@@ -1,6 +1,6 @@
 'use strict';
 
-const express = require('express');
+const restify = require('restify');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
@@ -8,7 +8,6 @@ const LocalStrategy = require('passport-local').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
 const authService = require('../services/auth-service');
 const configService = require('../services/config-service');
-const router = express.Router();
 
 
 function serdeUser() {
@@ -26,20 +25,6 @@ function addLocalStrategy() {
         .then(user => done(null, user))
         .catch(err => done(null, false, err))
     )
-  );
-}
-
-function addLocalRoutes() {
-  router.get(
-    '/login',
-    passport.authenticate('local', {
-      failureFlash: true
-    }),
-    (req, res) => res.redirect('/')
-  );
-  router.get(
-    '/failed',
-    (req, res) => res.status(401).json({error: 'Could not authenticate with cash counter'})
   );
 }
 
@@ -62,29 +47,6 @@ function addGoogleStrategy() {
   );
 }
 
-function addGoogleRoutes() {
-  router.get(
-    '/google/login',
-    passport.authenticate('google', {
-      scope: [
-        'profile',
-        'email'
-      ]
-    })
-  );
-  router.get(
-    '/google/callback',
-    passport.authenticate('google', {
-      failureRedirect: '/auth/google/failed'
-    }),
-    (req, res) => res.redirect('/')
-  );
-  router.get(
-    '/google/failed',
-    (req, res) => res.status(401).json({error: 'Could not authenticate with google'})
-  );
-}
-
 function addFacebookStrategy() {
   passport.use(
     new FacebookStrategy({
@@ -101,24 +63,6 @@ function addFacebookStrategy() {
         user => done(null, user.toObject())
       ).catch(err => done(null, false, err));
     })
-  );
-}
-
-function addFacebookRoutes() {
-  router.get(
-    '/facebook/login',
-    passport.authenticate('facebook', {scope: 'email'})
-  );
-  router.get(
-    '/facebook/callback',
-    passport.authenticate('facebook', {
-      failureRedirect: '/auth/facebook/failed'
-    }),
-    (req, res) => res.redirect('/')
-  );
-  router.get(
-    '/facebook/failed',
-    (req, res) => res.status(401).json({error: 'Could not authenticate with facebook'})
   );
 }
 
@@ -141,24 +85,6 @@ function addGitHubStrategy() {
   );
 }
 
-function addGitHubRoutes() {
-  router.get(
-    '/github/login',
-    passport.authenticate('github', {scope: 'email'})
-  );
-  router.get(
-    '/github/callback',
-    passport.authenticate('github', {
-      failureRedirect: '/auth/github/failed'
-    }),
-    (req, res) => res.redirect('/')
-  );
-  router.get(
-    '/github/failed',
-    (req, res) => res.status(401).json({error: 'Could not authenticate with github'})
-  );
-}
-
 function addStrategies() {
   addLocalStrategy();
   addGoogleStrategy();
@@ -166,19 +92,110 @@ function addStrategies() {
   addGitHubStrategy();
 }
 
-function addRoutes() {
-  addLocalRoutes();
-  addGoogleRoutes();
-  addFacebookRoutes();
-  addGitHubRoutes();
-  router.get('/logout', (req, res) => {
+function addLocalRoutes(server, prefix) {
+  server.get(
+    prefix + '/login',
+    passport.authenticate('local', {
+      failureFlash: true
+    }),
+    (req, res, next) => res.redirect('/', next)
+  );
+  server.get(
+    prefix + '/failed',
+    (req, res, next) => {
+      return next(new restify.errors.InvalidCredentialsError('AUTH.ERRORS.CASH_COUNTER'));
+    }
+  );
+}
+
+function addGoogleRoutes(server, prefix) {
+  server.get(
+    prefix + '/google/login',
+    passport.authenticate('google', {
+      scope: [
+        'profile',
+        'email'
+      ]
+    })
+  );
+  server.get(
+    prefix + '/google/callback',
+    passport.authenticate('google', {
+      failureRedirect: '/auth/google/failed'
+    }),
+    (req, res, next) => res.redirect('/', next)
+  );
+  server.get(
+    prefix + '/google/failed',
+    (req, res, next) => {
+      return next(new restify.errors.InvalidCredentialsError('AUTH.ERRORS.GOOGLE'));
+    }
+  );
+}
+
+function addFacebookRoutes(server, prefix) {
+  server.get(
+    prefix + '/facebook/login',
+    passport.authenticate('facebook', {scope: 'email'})
+  );
+  server.get(
+    prefix + '/facebook/callback',
+    passport.authenticate('facebook', {
+      failureRedirect: '/auth/facebook/failed'
+    }),
+    (req, res, next) => res.redirect('/', next)
+  );
+  server.get(
+    prefix + '/facebook/failed',
+    (req, res, next) => {
+      return next(new restify.errors.InvalidCredentialsError('AUTH.ERRORS.FACEBOOK'));
+    }
+  );
+}
+
+function addGitHubRoutes(server, prefix) {
+  server.get(
+    prefix + '/github/login',
+    passport.authenticate('github', {scope: 'email'})
+  );
+  server.get(
+    prefix + '/github/callback',
+    passport.authenticate('github', {
+      failureRedirect: '/auth/github/failed'
+    }),
+    (req, res, next) => res.redirect('/', next)
+  );
+  server.get(
+    prefix + '/github/failed',
+    (req, res, next) => {
+      return next(new restify.errors.InvalidCredentialsError('AUTH.ERRORS.GIT_HUB'));
+    }
+  );
+}
+
+function addRoutes(server, prefix) {
+  addLocalRoutes(server, prefix);
+  addGoogleRoutes(server, prefix);
+  addFacebookRoutes(server, prefix);
+  addGitHubRoutes(server, prefix);
+  server.get(prefix + '/logout', (req, res, next) => {
     req.logout();
-    res.redirect('/login');
+    res.redirect('/', next);
   });
+}
+
+function authenticate(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.send(401);
+  return next();
 }
 
 serdeUser();
 addStrategies();
-addRoutes();
 
-module.exports = router;
+module.exports = {
+  addRoutes,
+  authenticate
+};

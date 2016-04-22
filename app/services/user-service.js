@@ -1,7 +1,7 @@
 'use strict';
 
 const lamb = require('lamb');
-const BluePromise = require('bluebird');
+const bluebird = require('bluebird');
 const userProvider = require('../providers/user-provider');
 const encryptService = require('./encryption-service');
 
@@ -25,30 +25,30 @@ function countUserKeys(user) {
 
 function validateUser(user) {
   if (lamb.isNil(user)) {
-    return BluePromise.reject('USER.ERROR.EMPTY_USER');
+    return bluebird.reject('USER.ERROR.EMPTY_USER');
   }
   const keyQty = countUserKeys(user);
   if (keyQty > 1) {
-    return BluePromise.reject('USER.ERROR.MULTIPLE_KEYS');
+    return bluebird.reject('USER.ERROR.MULTIPLE_KEYS');
   } else if (keyQty < 1) {
-    return BluePromise.reject('USER.ERROR.EMPTY_KEY');
+    return bluebird.reject('USER.ERROR.EMPTY_KEY');
   }
   if (!lamb.isNil(user.firstName) && user.firstName.length > 20) {
-    return BluePromise.reject('USER.ERROR.FIRST_NAME_MAX_LENGTH');
+    return bluebird.reject('USER.ERROR.FIRST_NAME_MAX_LENGTH');
   }
   if (!lamb.isNil(user.lastName) && user.lastName.length > 50) {
-    return BluePromise.reject('USER.ERROR.LAST_NAME_MAX_LENGTH');
+    return bluebird.reject('USER.ERROR.LAST_NAME_MAX_LENGTH');
   }
   if (!lamb.isNil(user.email)) {
     if (lamb.isNil(user.password)) {
-      return BluePromise.reject('USER.ERROR.EMPTY_PASSWORD');
+      return bluebird.reject('USER.ERROR.EMPTY_PASSWORD');
     } else {
       return encryptService.encrypt(user.password).then(hash =>
         user.password = hash
       );
     }
   } else {
-    return BluePromise.resolve();
+    return bluebird.resolve();
   }
 }
 
@@ -70,8 +70,10 @@ function findOne(filter) {
   return userProvider.findOne(filter);
 }
 
-exports.validateUser = validateUser;
-exports.insert = insert;
-exports.findById = findById;
-exports.findByEmail = findByEmail;
-exports.findOne = findOne;
+module.exports = {
+  validateUser,
+  insert,
+  findById,
+  findByEmail,
+  findOne
+};

@@ -16,11 +16,13 @@ function findOne(model, filter) {
   return model.findOne(filter);
 }
 
-function getById(model, id) {
+function findById(model, id) {
   return isIdValid(id) ? findOne(model, {'_id': id}) : BluePromise.resolve(null);
 }
 
-exports.insert = insert;
-exports.findById = getById;
-exports.findOne = findOne;
-exports.isIdValid = isIdValid;
+module.exports = {
+  insert,
+  findById,
+  findOne,
+  isIdValid
+};

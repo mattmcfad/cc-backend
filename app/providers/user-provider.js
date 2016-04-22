@@ -20,7 +20,9 @@ function findOne(filter) {
   return commonProvider.findOne(model, filter);
 }
 
-exports.insert = insert;
-exports.findById = findById;
-exports.findByEmail = findByEmail;
-exports.findOne = findOne;
+module.exports = {
+  insert,
+  findById,
+  findByEmail,
+  findOne
+};
