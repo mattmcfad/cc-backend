@@ -44,7 +44,7 @@ function validateUser(user) {
       return bluebird.reject('USER.ERROR.EMPTY_PASSWORD');
     } else {
       return encryptService.encrypt(user.password).then(hash =>
-        user.password = hash
+        lamb.merge(user, {password: hash})
       );
     }
   } else {
@@ -52,9 +52,9 @@ function validateUser(user) {
   }
 }
 
-function insert(object) {
-  return validateUser(object).then(() =>
-    userProvider.insert(object)
+function insert(user) {
+  return validateUser(user).then((validUser) =>
+    userProvider.insert(validUser)
   );
 }
 
