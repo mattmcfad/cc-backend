@@ -21,7 +21,7 @@ gulp.task('lint', () =>
     .pipe(jscs.reporter('fail'))
 );
 
-gulp.task('ut-tests', () =>
+gulp.task('ut-tests', (cb) => {
   gulp.src(['app/**/*.js'])
     .pipe(istanbul({includeUntested: true}))
     .pipe(istanbul.hookRequire())
@@ -37,7 +37,9 @@ gulp.task('ut-tests', () =>
           ],
           reportOpts: { dir: 'test/coverage/ut-coverage/reports'}
         }))
-));
+        .on('end', () => cb())
+    );
+});
 
 gulp.task('api-tests', (cb) => {
   gulp.src(['app/**/*.js'])
@@ -79,27 +81,3 @@ gulp.task('merge-coverage', () =>
 gulp.task('all-tests', () =>
   runSequence('lint', 'ut-tests', 'api-tests', 'merge-coverage')
 );
-
-gulp.task('continuous-tests', () => {
-  const debounceOption = process.argv.indexOf('--debounce');
-  let debounce;
-  if (debounceOption > -1) {
-    debounce = process.argv[debounceOption + 1];
-  } else {
-    debounce = 10000;
-  }
-  let timer = null;
-  gulp.watch([
-    'app/**/*.*',
-    'test/src/**/*.*',
-    '*.js',
-    '.jshintrc',
-    '.jscsrc'
-  ], () => {
-    clearTimeout(timer);
-    timer = setTimeout(() =>
-      runSequence('all-tests'),
-      debounce
-    );
-  });
-});

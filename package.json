@@ -9,7 +9,6 @@
   "scripts": {
     "start": "node startup.js",
     "test": "gulp all-tests",
-    "test:continuous": "gulp continuous-tests",
     "test:ut": "gulp ut-tests",
     "test:api": "gulp api-tests"
   },
