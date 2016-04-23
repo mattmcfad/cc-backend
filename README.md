@@ -16,14 +16,8 @@ To start the app run:
 
 ## Running tests
 
-Tests run in a different node port, so server never needs to stop since test will start and shutdown its own required server.
-To keep running lint + all tests, open a new terminal and run:
-
-`npm run dev`
-
-This ^ will make you keep listening to changes in any file, the debounce default is 10 seconds. 
-There are two types of tests, unit and api (e2e).
-Each type of tests generates its own coverage report. When running all tests coverages will be merged into a single final report.
+There are two types of tests, unit and api (e2e). Tests run in a different node port, so server never needs to stop since test will start and shutdown its own required server.
+Each type of tests generates its own coverage report. When running all tests both coverages will be merged into a single final report.
 The following commands are used to run tests:
 
 `npm run test` // to run all tests
@@ -39,4 +33,4 @@ Coverage reports can be found inside test folder:
 
 ## Linter
 
-The linter runs only when `all-tests` run, 
+The linter runs only when `npm run test` command is run.
