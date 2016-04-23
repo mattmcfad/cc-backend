@@ -5,30 +5,24 @@ global.WINSTON = require('winston');
 const app = require('../../../app/app');
 const databaseUtil = require('../../../app/apis/database-api');
 const sinon = require('sinon');
-const configResource = require('../../../app/services/config-resource');
+const configService = require('../../../app/services/config-service');
 
 /**
- * Mock config resource so we can run against test database instead of
- * regular database.
- * Better doing this here so we don't put test code inside app folder.
+ * Mock server configuration so we can run against test database.
  */
-sinon.stub(configResource, 'getDBConnectionURI', () =>
-  configResource.get('MONGO_TEST_URI') + configResource.get('MONGO_TEST_DB')
+sinon.stub(configService, 'getDBConnectionURI', () =>
+  configService.getByKey('MONGO_TEST_URI') + configService.getByKey('MONGO_TEST_DB')
 );
 
 /**
- * Start up the server, clean up the database before running tests.
+ * Start up the server and clean up the database before running tests.
  */
 before(function(done) {
   this.timeout(1000);
-  const port = configResource.get('NODE_TEST_PORT');
-  const source = app.startup({
-    port: port,
-    disableCache: true
-  });
-  source.subscribe((app) => {
+  const port = configService.getByKey('NODE_TEST_PORT');
+  app.startup(port).then(() => {
     global.WINSTON.info(
-      `Server started at ${new Date().toISOString()} on port ${app.get('port')}`
+      `Server started at ${new Date().toISOString()} on port ${port}`
     );
     databaseUtil.dropDatabase();
     global.WINSTON.info(
@@ -45,6 +39,6 @@ before(function(done) {
  */
 after(done => {
   app.shutdown();
-  configResource.getDBConnectionURI.restore();
+  configService.getDBConnectionURI.restore();
   done();
 });

@@ -7,13 +7,9 @@ const app = require('./app/app');
 
 function startup() {
   const port = process.env.PORT || 3010;
-  const startupPromise = app.startup({
-    port: port,
-    disableCache: true
-  });
-  startupPromise.then(app =>
+  app.startup(port).then(() =>
     global.WINSTON.info(
-      `Server started at ${new Date().toISOString()} on port ${app.get('port')}`
+      `Server started at ${new Date().toISOString()} on port ${port}`
     )
   ).catch(err => {
     global.WINSTON.error(err);
