@@ -1,27 +1,25 @@
 'use strict';
 
-global.WINSTON = require('winston');
-
+const logger = require('./app/apis/logger-api');
 const app = require('./app/app');
 
 
 function startup() {
   const port = process.env.PORT || 3010;
   app.startup(port).then(() =>
-    global.WINSTON.info(
+    logger.info(
       `Server started at ${new Date().toISOString()} on port ${port}`
     )
   ).catch(err => {
-    global.WINSTON.error(err);
+    logger.error(err);
     process.exit(1);
   });
 }
 
-
 function shutdown() {
-  global.WINSTON.info('Received kill signal, shutdown server...');
+  logger.info('Received kill signal, shutdown server...');
   app.shutdown();
-  global.WINSTON.info('Server has been successfully shutdown');
+  logger.info('Server has been successfully shutdown');
   process.exit(0);
 }
 
