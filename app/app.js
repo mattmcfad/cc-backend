@@ -7,7 +7,6 @@ const CookieParser = require('restify-cookies');
 const session = require('express-session');
 const flash = require('connect-flash');
 const passport = require('passport');
-const morgan = require('morgan');
 const databaseApi = require('./apis/database-api');
 const logger = require('./apis/logger-api');
 const configService = require('./services/config-service');
