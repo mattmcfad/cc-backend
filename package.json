@@ -15,20 +15,19 @@
   "dependencies": {
     "bcrypt": "^0.8.5",
     "bluebird": "^3.3.5",
+    "bunyan": "^1.8.1",
     "connect-flash": "^0.1.1",
     "express-session": "^1.13.0",
     "lamb": "^0.21.0",
     "mongodb": "^2.1.16",
     "mongoose": "^4.4.12",
-    "morgan": "^1.7.0",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.0",
     "passport-github2": "^0.1.10",
     "passport-google-oauth": "^1.0.0",
     "passport-local": "^1.0.0",
     "restify": "^4.0.4",
-    "restify-cookies": "^0.2.0",
-    "winston": "^2.2.0"
+    "restify-cookies": "^0.2.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",

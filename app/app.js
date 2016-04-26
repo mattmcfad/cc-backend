@@ -7,12 +7,13 @@ const CookieParser = require('restify-cookies');
 const session = require('express-session');
 const flash = require('connect-flash');
 const passport = require('passport');
-const morgan = require('morgan');
-const databaseAPI = require('./apis/database-api');
-const routers = require('./routers');
+const databaseApi = require('./apis/database-api');
+const logger = require('./apis/logger-api');
 const configService = require('./services/config-service');
+const routers = require('./routers');
 const server = restify.createServer({
-  name: 'CashCounter'
+  name: 'CashCounter',
+  log: logger
 });
 
 
@@ -31,27 +32,19 @@ function setup() {
       maxAge: 1800000
     }
   }));
+  server.on('after', restify.auditLogger({
+    log: logger,
+    body: true
+  }));
   server.use(flash());
   server.use(passport.initialize());
   server.use(passport.session());
-  server.use(morgan('dev'));
-  server.get(
-    '/foo/:id',
-    function(req, res, next) {
-      console.log('Authenticate');
-      return next();
-    },
-    function(req, res, next) {
-      res.send(200, {test: 'aiuehaiuehaiueh'});
-      return next();
-    }
-  );
   routers(server);
 }
 
 function startup(port) {
   setup();
-  return databaseAPI.connect().then(() =>
+  return databaseApi.connect().then(() =>
     bluebird.promisify(server.listen, {context: server})(port)
   );
 }
@@ -59,7 +52,7 @@ function startup(port) {
 function shutdown() {
   if (!lamb.isNil(server)) {
     server.close();
-    databaseAPI.close();
+    databaseApi.close();
   }
 }
 

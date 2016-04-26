@@ -1,7 +1,6 @@
 'use strict';
 
-global.WINSTON = require('winston');
-
+const logger = require('../../../app/apis/logger-api');
 const app = require('../../../app/app');
 const databaseUtil = require('../../../app/apis/database-api');
 const sinon = require('sinon');
@@ -21,14 +20,14 @@ before(function(done) {
   this.timeout(1000);
   const port = configService.getByKey('NODE_TEST_PORT');
   app.startup(port).then(() => {
-    global.WINSTON.info(
+    logger.info(
       `Server started at ${new Date().toISOString()} on port ${port}`
     );
     databaseUtil.dropDatabase();
-    global.WINSTON.info(
+    logger.info(
       'Test database was successfully cleaned up before execution'
     );
-    global.WINSTON.info('Start running API tests...');
+    logger.info('Start running API tests...');
     done();
   });
 });
